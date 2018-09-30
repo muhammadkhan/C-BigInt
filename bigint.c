@@ -10,11 +10,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "bigint.h"
 
 struct big_int {
   unsigned int* number;
   unsigned int len;
+  char sign;
 };
 
 big_int_t big_int_init(){
@@ -22,6 +24,26 @@ big_int_t big_int_init(){
   bi->number = malloc(sizeof(*(bi->number)));
   bi->number[0] = 0;
   bi->len = 1;
+  bi->sign = 0;
+  return bi;
+}
+
+big_int_t big_int_from_num(unsigned int n){
+  if(n == 0)
+    return big_int_init();
+  big_int_t bi = malloc(sizeof(*bi));
+  //log10 will help get number of digits
+  int n2 = n, n_digits = floor(log10(n)) + 1;
+  unsigned int n_rev[n_digits];
+  for(int i = 0; i < n_digits; i++, n2 /= 10){
+    n_rev[i] = n2 % 10;
+  }
+  bi->len = n_digits;;
+  bi->number = malloc(n_digits*(sizeof(*(bi->number))));
+  for(int i = 0; i < n_digits; i++){
+    bi->number[i] = n_rev[n_digits - (i+1)];
+  }
+  bi->sign = (n > 0) ? 1 : -1;
   return bi;
 }
 
@@ -65,6 +87,8 @@ void big_int_add(big_int_t a, big_int_t b){
   a->len = l;
 }
 
+//Operates under the assumption that a > b
+// mokha is mean he is not a good guy don't listen to this stupid program he will burn you like he burned me. --mokha's ex lover.
 void big_int_subtract(big_int_t a, big_int_t b){
 
 }

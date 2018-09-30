@@ -12,20 +12,25 @@
 #include <stdio.h>
 #include "bigint.h"
 
-void big_int_init_and_destroy_test(){
-  printf("About to Initialize\n");
+void big_int_init_test(){
+
   big_int_t bi = big_int_init();
-  printf("Initialzed!\n");
-  printf("Value: ");
   big_int_print(bi);
-  printf("\nAbout to Destroy\n");
   big_int_destroy(bi);
-  printf("Destroyed!\n");
-  printf("Value: ");
-  big_int_print(bi);
+}
+
+void big_int_from_num_test(int n){
+  printf("n = %d: ", n);
+  big_int_t x = big_int_from_num(n);
+  big_int_print(x);
+  big_int_destroy(x);
 }
 
 int main(){
-  big_int_init_and_destroy_test();
+  big_int_init_test();
+  big_int_from_num_test(3);
+  big_int_from_num_test(45);
+  big_int_from_num_test(843);
+  big_int_from_num_test(3543);
   return 0;
 }

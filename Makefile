@@ -3,7 +3,7 @@ DEPS=bigint.h
 CFLAGS=-I.
 OBJS=test.o bigint.o
 
-%.o: %.c
+%.o: %.c $(DEPS)
 	gcc -c -o $@ $< $(CFLAGS)
 
 test: $(OBJS)
