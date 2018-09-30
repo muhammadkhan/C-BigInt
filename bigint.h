@@ -22,11 +22,42 @@ extern "C" {
    */
   big_int_t big_int_init();
 
+  /**
+   * @brief      Creates a big integer from the given integer
+   *
+   * @details    big_int_from_int(n) takes in a (signed) integer and creates the
+   *             big_int wrapper around it so that it may be treated as a big_int.
+   *
+   * @param      [n] a signed integer which is to be converted
+   *
+   * @return     A (dynamically allocated) big integer whose value is the input number
+   */
+  big_int_t big_int_from_int(int n);
 
   /**
-   * Creates a big integer from the given number.
+   * @brief      Creates a big integer from the given long long integer
+   *
+   * @details    big_int_from_long_long(n) takes in a (signed) long long integer and
+   *             creates the big_int wrapper around it so that it may be treated as
+   *             a big_int
+   *
+   * @param      [n] a signed long long integer which is to be converted
+   *
+   * @return     A (dynamically allocated) big integer whose value is the input number
    */
-  big_int_t big_int_from_num(unsigned int n);
+  big_int_t big_int_from_long_long(long long n);
+
+  /**
+   * @brief      Converts the given big_int into a (signed) long long
+   *
+   * @details    big_int_to_long_long(bi) will take the given big_int and return
+   *             it to the standard long long int.
+   *
+   * @param      [bi] The big_int to be converted into long long
+   *
+   * @return     A long long with the same value as bi->number
+   */
+  long long big_int_to_long_long(big_int_t bi);
 
 
   /**

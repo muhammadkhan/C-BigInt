@@ -13,6 +13,8 @@
 #include <math.h>
 #include "bigint.h"
 
+#define UINT_BITS 8*sizeof(unsigned int)
+
 struct big_int {
   unsigned int* number;
   unsigned int len;
@@ -28,23 +30,55 @@ big_int_t big_int_init(){
   return bi;
 }
 
-big_int_t big_int_from_num(unsigned int n){
+big_int_t big_int_from_int(int n){
   if(n == 0)
     return big_int_init();
   big_int_t bi = malloc(sizeof(*bi));
-  //log10 will help get number of digits
-  int n2 = n, n_digits = floor(log10(n)) + 1;
-  unsigned int n_rev[n_digits];
-  for(int i = 0; i < n_digits; i++, n2 /= 10){
-    n_rev[i] = n2 % 10;
-  }
-  bi->len = n_digits;;
-  bi->number = malloc(n_digits*(sizeof(*(bi->number))));
-  for(int i = 0; i < n_digits; i++){
-    bi->number[i] = n_rev[n_digits - (i+1)];
-  }
+  bi->number = malloc(sizeof(*(bi->number)));
+  bi->len = 1;
   bi->sign = (n > 0) ? 1 : -1;
+  unsigned int n_abs = (unsigned int)(n*bi->sign);
+  bi->number[0]=n_abs;
   return bi;
+}
+
+big_int_t big_int_from_long_long(long long n){
+  if(n == 0)
+    return big_int_init();
+  char s = (n > 0) ? 1 : -1;
+  unsigned long long n_abs = (unsigned long long)(s*n);
+  unsigned int l = 0;
+  unsigned long long n2 = n_abs, n3 = n_abs;
+  do{
+    n2 >>= UINT_BITS;
+    l++;
+  } while (n2 > 0);
+  big_int_t bi = malloc(sizeof(*bi));
+  bi->sign = s;
+  bi->len = l;
+  bi->number = malloc(l*sizeof(*(bi->number)));
+  for(int i = l-1; i >= 0; i--, n3 >>= UINT_BITS) {
+    //casting long long to int simply takes the last int's worth of bits
+    // i.e. UINT_BITS
+    bi->number[i] = (unsigned int)n3;
+  }
+  return bi;
+}
+
+long long big_int_to_long_long(big_int_t bi){
+  long long ret = 0;
+  for(int i = 0; i < bi->len; ++i){
+    //need to cast as long long otherwise left shift won't work
+    //because otherwise shifting an unsigned int by more bits than
+    //the size of an unsigned int
+    unsigned long long temp = (unsigned long long)(bi->number[i]);
+    ret |= temp << (UINT_BITS*(bi->len - i - 1));
+  }
+
+  //Two's Complement
+  if(bi->sign < 0)
+    ret = ~ret + 1;
+  return ret;
 }
 
 void big_int_destroy(big_int_t bi){
@@ -97,7 +131,6 @@ void big_int_print(big_int_t bi){
   if(bi == NULL){
     printf("NULL\n");
   }
-  for(int i = 0; i < bi->len; i++)
-    printf("%d", bi->number[i]);
-  printf("\n");
+
+  printf("%lld\n",big_int_to_long_long(bi));
 }
