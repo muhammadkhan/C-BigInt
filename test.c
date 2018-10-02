@@ -44,14 +44,38 @@ void scratchpad(){
   printf("741 (1011100101) inverted = %d\n", ~x);
 }
 
+void big_int_add_test(){
+  big_int_t b1 = big_int_from_int(INT_MAX);
+  big_int_t b2 = big_int_from_long_long(LLONG_MAX);
+  big_int_t b3 = big_int_from_long_long(LLONG_MAX);
+  printf("INT_MAX: ");
+  big_int_print(b1);
+  printf("\nLLONG_MAX: ");
+  big_int_print(b2);
+  big_int_add(b1, b3);
+  big_int_add(b2, b3);
+  printf("\nINT_MAX + LLONG_MAX = ");
+  big_int_print(b1);
+  printf("\nLLONG_MAX + LLONG_MAX = ");
+  big_int_print(b2);
+  big_int_add(b2,b3);
+  printf("\nLLONG_MAX*3 = ");
+  big_int_print(b2);
+  printf("\n");
+  big_int_destroy(b1);
+  big_int_destroy(b2);
+  big_int_destroy(b3);
+}
+
 int main(){
   //big_int_init_test();
   //big_int_from_int_test(INT_MIN);
   //big_int_from_int_test(INT_MAX);
   //big_int_from_int_test(UINT_MAX);
-  big_int_from_long_long_test(LLONG_MIN);
-  big_int_from_long_long_test(LLONG_MAX);
-  big_int_from_long_long_test(ULLONG_MAX);
-  scratchpad();
+  //big_int_from_long_long_test(LLONG_MIN);
+  //big_int_from_long_long_test(LLONG_MAX);
+  //big_int_from_long_long_test(ULLONG_MAX);
+  big_int_add_test();
+  //scratchpad();
   return 0;
 }

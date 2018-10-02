@@ -57,7 +57,8 @@ big_int_t big_int_from_long_long(long long n){
   bi->sign = s;
   bi->len = l;
   bi->number = malloc(l*sizeof(*(bi->number)));
-  for(int i = l-1; i >= 0; i--, n3 >>= UINT_BITS) {
+  //These are being stored in reverse order
+  for(int i = 0; i < l; i++, n3 >>= UINT_BITS) {
     //casting long long to int simply takes the last int's worth of bits
     // i.e. UINT_BITS
     bi->number[i] = (unsigned int)n3;
@@ -72,7 +73,7 @@ long long big_int_to_long_long(big_int_t bi){
     //because otherwise shifting an unsigned int by more bits than
     //the size of an unsigned int
     unsigned long long temp = (unsigned long long)(bi->number[i]);
-    ret |= temp << (UINT_BITS*(bi->len - i - 1));
+    ret |= temp << (UINT_BITS*i);
   }
 
   //Two's Complement
@@ -99,26 +100,36 @@ void big_int_add(big_int_t a, big_int_t b){
     new_len = b->len;
   }
   unsigned int new_num[new_len];
-  int gap = bigger.len - smaller.len;
-  unsigned int carry = 0;
-  for(int i = new_len - 1; i >= 0; i--){
-    int b_index = i, s_index = i-gap;
-    unsigned int temp = carry + bigger.number[b_index] + ((s_index >= 0) ? smaller.number[s_index] : 0);
-    new_num[b_index] = temp % 10;
-    carry = temp / 10;
+  //int gap = bigger.len - smaller.len;
+  unsigned long long carry = 0;
+  for(int i = 0; i < new_len; i++){
+    /* int b_index = i, s_index = i-gap; */
+    /* unsigned int temp = carry + bigger.number[b_index] + ((s_index >= 0) ? smaller.number[s_index] : 0); */
+    /* new_num[b_index] = temp % 10; */
+    /* carry = temp / 10; */
+    unsigned long long sum = carry + (unsigned long long)bigger.number[i];
+    sum += (i < smaller.len) ? (unsigned long long)smaller.number[i] : 0;
+    new_num[i] = (unsigned int)sum;
+    carry = sum >> UINT_BITS;
+    /* printf("carry = %llx, sum = %llx\n", carry, sum); */
+    /* printf("new_num[%d] = %x\n", i, new_num[i]); */
   }
   int l = (carry > 0) ? 1+new_len : new_len;
-  unsigned int* num = malloc(l*sizeof(*num));
-  if(carry > 0){
-    num[0] = carry;
-    for(int i = 0; i < new_len; i++)
-      num[i+1] = new_num[i];
-  } else
-    num = new_num;
-
   free(a->number);
-  a->number = num;
   a->len = l;
+  a->number = malloc(l*sizeof(*(a->number)));
+  /* if(carry > 0){ */
+  /*   a->number[0] = (unsigned int)carry; */
+  /*   for(int i = 0; i < new_len; i++) */
+  /*     a->number[i+1] = new_num[i]; */
+  /* } else */
+  /*   a->number = new_num; */
+
+  for(int i = 0; i < new_len; i++){
+    a->number[i] = new_num[i];
+  }
+  if(carry > 0)
+    a->number[new_len] = (unsigned int)carry;
 }
 
 //Operates under the assumption that a > b
@@ -132,5 +143,9 @@ void big_int_print(big_int_t bi){
     printf("NULL\n");
   }
 
-  printf("%lld\n",big_int_to_long_long(bi));
+  //printf("%lld\n",big_int_to_long_long(bi));
+  for(int i = bi->len - 1; i >= 0; i--) {
+    printf("%x", bi->number[i]);
+  }
+  printf("\n");
 }
